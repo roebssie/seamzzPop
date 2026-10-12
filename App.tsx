@@ -1,6 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
+import * as ImagePicker from 'expo-image-picker';
 import {
+  Image,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -26,11 +28,29 @@ const colors = {
 export default function App() {
   const [screen, setScreen] = useState<Screen>('home');
   const [link, setLink] = useState('');
+  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [projectSource, setProjectSource] = useState<'photo' | 'link' | null>(null);
   const [showNotice, setShowNotice] = useState(false);
 
   const handleAnalyze = () => {
+    if (link.trim()) setProjectSource('link');
     setShowNotice(true);
     setTimeout(() => setShowNotice(false), 3500);
+  };
+
+  const handlePickPhoto = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 0.85,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+      setProjectSource('photo');
+      setShowNotice(true);
+      setTimeout(() => setShowNotice(false), 3500);
+    }
   };
 
   return (
@@ -51,12 +71,13 @@ export default function App() {
               link={link}
               setLink={setLink}
               onAnalyze={handleAnalyze}
+              onPickPhoto={handlePickPhoto}
               showNotice={showNotice}
               onDiscover={() => setScreen('discover')}
             />
           )}
           {screen === 'discover' && <DiscoverScreen />}
-          {screen === 'projects' && <ProjectsScreen />}
+          {screen === 'projects' && <ProjectsScreen imageUri={imageUri} projectSource={projectSource} />}
         </ScrollView>
 
         <View style={styles.tabBar}>
@@ -69,10 +90,11 @@ export default function App() {
   );
 }
 
-function HomeScreen({ link, setLink, onAnalyze, showNotice, onDiscover }: {
+function HomeScreen({ link, setLink, onAnalyze, onPickPhoto, showNotice, onDiscover }: {
   link: string;
   setLink: (value: string) => void;
   onAnalyze: () => void;
+  onPickPhoto: () => void;
   showNotice: boolean;
   onDiscover: () => void;
 }) {
@@ -91,7 +113,7 @@ function HomeScreen({ link, setLink, onAnalyze, showNotice, onDiscover }: {
           <Text style={styles.thread}>✺</Text>
         </View>
         <Text style={styles.cardBody}>Add a photo from your camera roll, or paste a link you have permission to analyse.</Text>
-        <Pressable style={styles.uploadButton} onPress={() => {}}>
+        <Pressable style={styles.uploadButton} onPress={onPickPhoto}>
           <Text style={styles.uploadIcon}>＋</Text>
           <View><Text style={styles.uploadTitle}>Upload a garment photo</Text><Text style={styles.uploadSub}>Camera or photo library</Text></View>
         </Pressable>
@@ -107,7 +129,7 @@ function HomeScreen({ link, setLink, onAnalyze, showNotice, onDiscover }: {
         <Pressable style={[styles.primaryButton, !link && styles.primaryButtonMuted]} onPress={onAnalyze}>
           <Text style={styles.primaryButtonText}>Save for later</Text><Text style={styles.arrow}>→</Text>
         </Pressable>
-        {showNotice && <Text style={styles.notice}>Saved as a project placeholder. Analysis is coming in a future release.</Text>}
+        {showNotice && <Text style={styles.notice}>Saved to Projects. Analysis is coming in a future release.</Text>}
       </View>
 
       <View style={styles.sectionHeading}><Text style={styles.sectionTitle}>What happens next?</Text><Pressable onPress={onDiscover}><Text style={styles.seeAll}>See discovery →</Text></Pressable></View>
@@ -125,8 +147,8 @@ function DiscoverScreen() {
   return <><Text style={styles.pageTitle}>Pattern discovery</Text><Text style={styles.pageIntro}>A future home for patterns that are open, licensed, public-domain, or creator-authorized.</Text><View style={styles.emptyCard}><Text style={styles.emptyEmoji}>✂️</Text><Text style={styles.emptyTitle}>The catalog is being stitched together</Text><Text style={styles.emptyText}>We’ll start with transparent matches based on silhouette, neckline, sleeve, and construction details.</Text><Text style={styles.pill}>COMING IN THE FOUNDATION PHASE</Text></View></>;
 }
 
-function ProjectsScreen() {
-  return <><Text style={styles.pageTitle}>Your projects</Text><Text style={styles.pageIntro}>Keep inspiration, notes, measurements, and future pattern exports together.</Text><View style={styles.emptyCard}><Text style={styles.emptyEmoji}>◌</Text><Text style={styles.emptyTitle}>No projects yet</Text><Text style={styles.emptyText}>Save an inspiration link or photo from the Inspire tab to start a project.</Text></View></>;
+function ProjectsScreen({ imageUri, projectSource }: { imageUri: string | null; projectSource: 'photo' | 'link' | null }) {
+  return <><Text style={styles.pageTitle}>Your projects</Text><Text style={styles.pageIntro}>Keep inspiration, notes, measurements, and future pattern exports together.</Text>{projectSource === 'photo' && imageUri ? <View style={styles.projectCard}><Image source={{ uri: imageUri }} style={styles.projectImage} /><View style={styles.projectDetails}><Text style={styles.projectKicker}>INSPIRATION PHOTO</Text><Text style={styles.projectTitle}>New garment study</Text><Text style={styles.projectText}>Analysis is not available yet. Add notes and measurements when the project workspace arrives.</Text></View></View> : projectSource === 'link' ? <View style={styles.projectCard}><View style={styles.linkPreview}><Text style={styles.linkPreviewIcon}>↗</Text></View><View style={styles.projectDetails}><Text style={styles.projectKicker}>SAVED LINK</Text><Text style={styles.projectTitle}>New garment study</Text><Text style={styles.projectText}>The link is saved for future rights-aware discovery.</Text></View></View> : <View style={styles.emptyCard}><Text style={styles.emptyEmoji}>◌</Text><Text style={styles.emptyTitle}>No projects yet</Text><Text style={styles.emptyText}>Save an inspiration link or photo from the Inspire tab to start a project.</Text></View>}</>;
 }
 
 function Step({ number, title, text }: { number: string; title: string; text: string }) {
@@ -168,6 +190,14 @@ const styles = StyleSheet.create({
   primaryButtonText: { color: colors.white, fontWeight: '800', fontSize: 14 },
   arrow: { color: colors.white, fontSize: 18 },
   notice: { color: colors.coral, fontSize: 12, lineHeight: 17, marginTop: 11, textAlign: 'center' },
+  projectCard: { backgroundColor: colors.white, borderRadius: 22, overflow: 'hidden', borderWidth: 1, borderColor: colors.line },
+  projectImage: { width: '100%', height: 220, backgroundColor: colors.blush },
+  linkPreview: { height: 150, backgroundColor: colors.blush, alignItems: 'center', justifyContent: 'center' },
+  linkPreviewIcon: { color: colors.coral, fontSize: 48 },
+  projectDetails: { padding: 18 },
+  projectKicker: { color: colors.coral, fontSize: 10, fontWeight: '800', letterSpacing: 1.3, marginBottom: 6 },
+  projectTitle: { color: colors.ink, fontSize: 20, fontWeight: '800', marginBottom: 6 },
+  projectText: { color: colors.muted, fontSize: 13, lineHeight: 19 },
   sectionHeading: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 30, marginBottom: 14 },
   sectionTitle: { color: colors.ink, fontSize: 18, fontWeight: '800' },
   seeAll: { color: colors.coral, fontSize: 12, fontWeight: '700' },
