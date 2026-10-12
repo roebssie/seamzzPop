@@ -22,6 +22,7 @@ This is a directional roadmap, not a promise that every item will ship in the li
 - Add user correction and confidence workflows.
 - Expand garment categories only after fit and export tests pass.
 - Explore creator partnerships and a pattern-source contribution workflow.
+- Package the validated experience as iOS and Android apps with camera, sharing, project history, and PDF support.
 
 ## Success signals
 

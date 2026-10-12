@@ -62,6 +62,12 @@ This repository is at the concept and foundation stage. Pattern recognition, pat
 - Add print calibration checks, seam-allowance controls, and assembly instructions.
 - Collect opt-in feedback from makers and sewing educators.
 
+### Phase 5 — Mobile product
+
+- Deliver the validated workflow as an iOS and Android app.
+- Support camera/photo import, permitted link sharing, measurement entry, project history, and PDF preview/download.
+- Add mobile accessibility, privacy, offline-friendly project access, and platform-specific sharing flows.
+
 ## Non-goals for the first release
 
 - Scraping social platforms or bypassing access controls.
