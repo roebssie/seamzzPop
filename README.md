@@ -11,7 +11,27 @@ seamzzPop is intended to combine:
 
 ## Project status
 
-This repository is at the concept and foundation stage. Pattern recognition, pattern search, parametric drafting, and PDF generation are **not implemented yet**. Early work will focus on validating the user workflow, rights-aware content handling, measurement design, and safe technical foundations before attempting automated pattern generation.
+This repository now contains a working local-first Expo prototype for iOS and Android. Users can create projects from the camera, photo library, or a permitted link; keep multiple projects; edit names, notes, and basic measurements; and retain that information between app launches.
+
+Pattern recognition, pattern search, parametric drafting, cloud sync, and PDF generation are **not implemented yet**. The current app is an honest project-organizing foundation for validating the workflow before automated pattern generation is attempted.
+
+## Working prototype
+
+- Camera and photo-library inspiration import.
+- Validated web-link projects.
+- Durable on-device project and image storage.
+- Multiple-project library with a visible project count.
+- Editable project names, sewing notes, and bust/waist/hip measurements.
+- Confirmed iOS and Android JavaScript bundles.
+
+## Run locally
+
+```bash
+npm install
+npm start
+```
+
+Open the resulting project in Expo Go or an iOS/Android simulator. Camera behavior is best verified on a physical device.
 
 ## Product principles
 

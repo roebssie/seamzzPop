@@ -8,6 +8,16 @@
     "splash": {
       "backgroundColor": "#FFF9F4"
     },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow seamzzPop to add garment inspiration from your photo library.",
+          "cameraPermission": "Allow seamzzPop to photograph garment inspiration.",
+          "microphonePermission": false
+        }
+      ]
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.roebssie.seamzzpop"
